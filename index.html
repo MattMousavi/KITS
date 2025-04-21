@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kit Lookup Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f7f7f7;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 0.5rem;
+    }
+    .result {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Kit Lookup Tool</h1>
+    <p>Enter a part number to see if it belongs to a kit:</p>
+    <input type="text" id="partInput" placeholder="Enter part number..." onkeydown="if(event.key === 'Enter') lookupPart();" />
+    <button onclick="lookupPart()">Search</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script src="full_kitdata.js"></script>
+  <script src="full_kitinfo.js"></script>
+  <script>
+    function lookupPart() {
+      const inputField = document.getElementById("partInput");
+      const input = inputField.value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (input === "") {
+        resultDiv.textContent = "Please enter a part number.";
+        inputField.focus();
+        return;
+      }
+
+      if (kitData[input]) {
+        const kits = kitData[input].slice().sort((a, b) => a - b);
+        let message = `Part number ${input} belongs to the following kit(s):
+
+`;
+        kits.forEach(kit => {
+          const info = kitInfo[kit];
+          if (info) {
+            message += `Kit #${kit}
+  Main Item: ${info.main}
+  Local SKU: ${info.sku}
+
+`;
+          } else {
+            message += `Kit #${kit}: details not available\n`;
+          }
+        });
+        resultDiv.textContent = message;
+      } else {
+        resultDiv.textContent = `Part number ${input} is not a kit item.`;
+      }
+
+      inputField.value = "";
+      inputField.focus();
+    }
+  </script>
+</body>
+</html>
